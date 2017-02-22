@@ -31,6 +31,10 @@ def Ode(n,ksi,dksi,arrayspace):
     def solfunc(ksi):
         sol = odeint(Stellar,y0,ksi,args=(n,a))
         return sol
+
+
+
+
     # check if doing np.arry integration
     if arrayspace:
         ksi = np.arange(0.001,20,0.001)
