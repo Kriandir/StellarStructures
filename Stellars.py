@@ -85,7 +85,7 @@ for n in nvalues:
         anaplot(analist,color)
 
     if n == 1:
-        analist = np.exp((-1./6)*xlist**2)
+        analist = np.sin(xlist)/xlist
         color = "blue"
         anaplot(analist,color)
 
