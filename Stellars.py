@@ -8,84 +8,39 @@ from math import *
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
-from scipy import stats
-
-# Make class structure for performing calculations for the white dwarf and neutron star
-
-class Stellar:
-    def __init__(self,name):
-        self.c = 2.99792458*10**10
-        self.G = 6.67259*10**(-8)
-        self.hbar = 1.05457266*10**(-27)
-        self.mp = 1.6726231*10**(-24)
-        self.K = 0
-        self.xlist = np.array
-        self.ylist = np.array
-        self.r = np.array
-        self.rmax = 0
-        self.mass = 0
-        self.rho = np.array
-        self.phi = 0
-        self.rhocenter = 0
-
-        if name == "dwarf":
-            self.Dwarf()
-        if name == "neutron":
-            self.Neutron()
-
-    # appenddate to our objects
-    def appenddata(self,xlist,ylist,phi):
-        self.xlist = xlist
-        self.ylist = ylist
-        self.phi = phi
-
-    # define usefull values for Dwarfstar
-    def Dwarf(self):
-        self.K = (3**(1./3)*np.pi**(2./3)*self.hbar*self.c)/(2**(4./3)*4*self.mp**(4./3))
-        self.n = 3
-
-    # define usefull values for Neutronstar
-    def Neutron(self):
-        self.n = 1
-        self.mass = 1.4*1.99*10**33
-        self.rmax = 1*10**6
-
-    # calculate rhocenter for neutronstar
-    def calcrhocenter(self):
-        rhoaverage = self.mass/((4./3)*np.pi*self.rmax**3)
-        self.rhocenter = (-1./3/self.phi*xlist[-1]**3)*rhoaverage
-
-    # calculate mass for white dwarf
-    def calcmass(self):
-        print self.phi
-        self.mass = (-4./(np.sqrt(np.pi)))*(self.K/self.G)**(3./2)*self.phi
-
-
+import scipy.stats as ss
+import Starobjects as so
 
 
 #-----------------------------------------
-# define starting values
+# define starting values and initialize objects
+nvalues = [0,1,(3./2),2,3,4]
 initialtheta = 1.0
 initialphi = 0.
 dksi = 0.001
 end = 5
 arraystep = 5
 begin = dksi
-Neutron = Stellar("neutron")
-Dwarf = Stellar("dwarf")
+Neutron = so.Stellar("neutron")
+Dwarf = so.Stellar("dwarf")
 # ----------------------------------------
 
-
+# Function for converting pvalues to sigma confidence levels
+def p_to_sigmas(pval):
+    nd = ss.norm(0., 1.)
+# We use the 'inverse survival function', the inverse of the sf. We also need to divide
+# our p-value by 2 to account for the negative side of the normal distribution.
+    return nd.isf(pval/2.)
 
 # Function for plotting analytical solution
 def anaplot(analist,color):
     ax1.plot(xlist,analist,linestyle="dashed",linewidth ="3",color = color,label="analytic n = "+str(n))
-    anafinalrho = np.array(analist)**n
-    ax2.plot(xlist,anafinalrho,linestyle="dashed",linewidth ="3",color = color,label="analytic n = "+str(n))
+    # anafinalrho = np.array(analist)**n
+    # ax2.plot(xlist,anafinalrho,linestyle="dashed",linewidth ="3",color = color,label="analytic n = "+str(n))
 
-    ax3.plot(xlist,ylist-analist,linestyle="dashed",linewidth ="3",color = color,label="numeric n - analytic n for n = "+str(n))
-    ax4.plot(xlist,finalrho-anafinalrho,linestyle="dashed",linewidth ="3",color = color,label="numeric n - analytic n for n = "+str(n))
-    print stats.ttest_ind(ylist,analist)
+    ax3.plot(xlist,ylist-analist,linestyle="dashed",linewidth ="3",color = color,label="deviation for analytic and numeric n = "+str(n))
+    # ax4.plot(xlist,finalrho-anafinalrho,linestyle="dashed",linewidth ="3",color = color,label="numeric n - analytic n for n = "+str(n))
+    print "A sigma confidence level of: " + str(p_to_sigmas(1-ss.ttest_ind(ylist,analist)[1])) + "for n = " + str(n)
 
 # Function for ode integration
 def Ode(solreal,ksireal,phireal,n,dksi,begin,end,initialtheta,initialphi):
@@ -128,25 +83,18 @@ def Ode(solreal,ksireal,phireal,n,dksi,begin,end,initialtheta,initialphi):
 # define figure
 
 
-fig,(ax1,ax2) = plt.subplots(2,1,figsize=[20,20])
+fig,(ax1,ax2,ax3) = plt.subplots(3,1,figsize=[20,20])
 ax1.set_ylim([-0.1,1.1])
 ax2.set_ylim([-0.1,1.1])
-ax1.set_xlabel(r'$\xi$',fontsize=18)
-ax1.set_ylabel(r'$\theta$',fontsize=18,rotation=360)
-ax2.set_xlabel(r'$\xi$',fontsize=18)
-ax2.set_ylabel(r'$\frac{\rho}{\rho_c}$',fontsize=22,rotation=360)
+ax3.set_ylim([-0.006*dksi,0.006*dksi])
+ax1.set_xlabel(r'$\xi$',fontsize=20)
+ax1.set_ylabel(r'$\theta$',fontsize=20,rotation=360)
+ax2.set_xlabel(r'$\xi$',fontsize=20)
+ax2.set_ylabel(r'$\frac{\rho}{\rho_c}$',fontsize=25,rotation=360)
+ax3.set_xlabel(r'$\xi$',fontsize=20)
+ax3.set_ylabel(r'$\Delta\theta$',rotation=360,fontsize=20)
 
-fig2,(ax3,ax4) = plt.subplots(2,1,figsize=[20,20])
-ax3.set_ylim([-0.000006,0.000006])
-ax4.set_ylim([-0.000006,0.000006])
-ax3.set_xlabel(r'$\xi$',fontsize=18)
-ax3.set_ylabel(r'$difference$ $in$ $\theta$',fontsize=18)
-ax4.set_xlabel(r'$\xi$',fontsize=18)
-ax4.set_ylabel(r'$difference$ $in$ $\frac{\rho}{\rho_c}$',fontsize=22)
 
-# define nvalues to loop over and check whether using arrayspace
-nvalues = [1,3]
-arrayspace = True
 
 for n in nvalues:
     solreal = []
@@ -182,9 +130,9 @@ for n in nvalues:
 # Perform calculations
 
 Neutron.calcrhocenter()
-print Neutron.rhocenter
+print "The density at the center of the neutronstar = " + str(Neutron.rhocenter)
 Dwarf.calcmass()
-print Dwarf.mass/(1.99*10**33)
+print "The mass of the Dwarf star in solar mass = " + str(Dwarf.mass/(1.99*10**33))
 
 
 
@@ -192,5 +140,4 @@ print Dwarf.mass/(1.99*10**33)
 ax1.legend()
 ax2.legend()
 ax3.legend()
-ax4.legend()
 plt.show()
