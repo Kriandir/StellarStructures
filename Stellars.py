@@ -42,6 +42,7 @@ def anaplot(analist,color):
     # ax4.plot(xlist,finalrho-anafinalrho,linestyle="dashed",linewidth ="3",color = color,label="numeric n - analytic n for n = "+str(n))
     print "A sigma confidence level of: " + str(p_to_sigmas(1-ss.ttest_ind(ylist,analist)[1])) + "for n = " + str(n)
 
+
 # Function for ode integration
 def Ode(solreal,ksireal,phireal,n,dksi,begin,end,initialtheta,initialphi):
 
@@ -69,7 +70,6 @@ def Ode(solreal,ksireal,phireal,n,dksi,begin,end,initialtheta,initialphi):
 
 
     # Check whether we found a solution and return
-
     for i in range(0,len(solreal)):
         if solreal[i] <=0 or isnan(solreal[i]):
             return ksireal[:i],solreal[:i],phireal[i]
@@ -81,21 +81,27 @@ def Ode(solreal,ksireal,phireal,n,dksi,begin,end,initialtheta,initialphi):
 
 
 # define figure
-
-
 fig,(ax1,ax2,ax3) = plt.subplots(3,1,figsize=[20,20])
+fig.subplots_adjust(hspace=.5)
 ax1.set_ylim([-0.1,1.1])
+ttl = ax1.title
+ttl.set_position([.5, 1.05])
+ttl2 = ax2.title
+ttl2.set_position([.5, 1.05])
+ttl3 = ax2.title
+ttl3.set_position([.5, 1.05])
+ax1.set_title('Graph depicting '+ r'$\theta$'+ " dependence on " r'$\xi$',fontsize=20)
 ax2.set_ylim([-0.1,1.1])
+ax2.set_title('Graph depicting '+ r'$\frac{\rho}{\rho_c}$'+ " dependence on " r'$\xi$',fontsize=20)
 ax3.set_ylim([-0.006*dksi,0.006*dksi])
-ax1.set_xlabel(r'$\xi$',fontsize=20)
+ax3.set_title('Graph depicting the deviation of '+ r'$\theta$'+ "\'s dependence on " r'$\xi$',fontsize=20)
 ax1.set_ylabel(r'$\theta$',fontsize=20,rotation=360)
-ax2.set_xlabel(r'$\xi$',fontsize=20)
 ax2.set_ylabel(r'$\frac{\rho}{\rho_c}$',fontsize=25,rotation=360)
 ax3.set_xlabel(r'$\xi$',fontsize=20)
 ax3.set_ylabel(r'$\Delta\theta$',rotation=360,fontsize=20)
 
 
-
+# loop through n values and integrate
 for n in nvalues:
     solreal = []
     ksireal = []
@@ -105,7 +111,7 @@ for n in nvalues:
     xlist,ylist,phi = Ode(solreal,ksireal,phireal,n,dksi,begin,end,initialtheta,initialphi)
     finalrho = np.array(ylist)**n
 
-
+    # if analytical or dwarf or neutronstar perform additional calculations.
     if n == 0:
         analist = (1-(1./6)*xlist**2)
         color = "red"
@@ -120,6 +126,7 @@ for n in nvalues:
     if n == 3:
         Dwarf.appenddata(xlist,ylist,phi)
 
+
     # plot everything!
     ax1.plot(xlist,ylist,label="n = "+str(n) )
     ax1.axhline(y=0,linestyle="dotted")
@@ -130,6 +137,7 @@ for n in nvalues:
 # Perform calculations
 
 Neutron.calcrhocenter()
+print "---------------------------------------------------------------"
 print "The density at the center of the neutronstar = " + str(Neutron.rhocenter)
 Dwarf.calcmass()
 print "The mass of the Dwarf star in solar mass = " + str(Dwarf.mass/(1.99*10**33))
