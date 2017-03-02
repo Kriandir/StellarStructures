@@ -25,22 +25,12 @@ Neutron = so.Stellar("neutron")
 Dwarf = so.Stellar("dwarf")
 # ----------------------------------------
 
-# Function for converting pvalues to sigma confidence levels
-def p_to_sigmas(pval):
-    nd = ss.norm(0., 1.)
-# We use the 'inverse survival function', the inverse of the sf. We also need to divide
-# our p-value by 2 to account for the negative side of the normal distribution.
-    return nd.isf(pval/2.)
 
 # Function for plotting analytical solution
 def anaplot(analist,color):
     ax1.plot(xlist,analist,linestyle="dashed",linewidth ="3",color = color,label="analytic n = "+str(n))
-    # anafinalrho = np.array(analist)**n
-    # ax2.plot(xlist,anafinalrho,linestyle="dashed",linewidth ="3",color = color,label="analytic n = "+str(n))
-
     ax3.plot(xlist,ylist-analist,linestyle="dashed",linewidth ="3",color = color,label="deviation for analytic and numeric n = "+str(n))
-    # ax4.plot(xlist,finalrho-anafinalrho,linestyle="dashed",linewidth ="3",color = color,label="numeric n - analytic n for n = "+str(n))
-    print "A sigma confidence level of: " + str(p_to_sigmas(1-ss.ttest_ind(ylist,analist)[1])) + "for n = " + str(n)
+    # print "A sigma confidence level of: " + str(p_to_sigmas(1-ss.ttest_ind(ylist,analist)[1])) + "for n = " + str(n)
 
 
 # Function for ode integration
@@ -99,8 +89,9 @@ ax1.set_ylabel(r'$\theta$',fontsize=20,rotation=360)
 ax2.set_ylabel(r'$\frac{\rho}{\rho_c}$',fontsize=25,rotation=360)
 ax3.set_xlabel(r'$\xi$',fontsize=20)
 ax3.set_ylabel(r'$\Delta\theta$',rotation=360,fontsize=20)
-
-
+ax1.axhline(y=0,linestyle="dotted")
+ax2.axhline(y=0,linestyle="dotted")
+ax3.axhline(y=0,linestyle="dotted")
 # loop through n values and integrate
 for n in nvalues:
     solreal = []
@@ -129,9 +120,9 @@ for n in nvalues:
 
     # plot everything!
     ax1.plot(xlist,ylist,label="n = "+str(n) )
-    ax1.axhline(y=0,linestyle="dotted")
+
     ax2.plot(xlist,finalrho,label="n = "+str(n))
-    ax2.axhline(y=0,linestyle="dotted")
+
 
 
 # Perform calculations
