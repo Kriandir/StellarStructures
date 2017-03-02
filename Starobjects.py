@@ -47,7 +47,7 @@ class Stellar:
     # calculate rhocenter for neutronstar
     def calcrhocenter(self):
         rhoaverage = self.mass/((4./3)*np.pi*self.rmax**3)
-        self.rhocenter = (-1./3/self.phi*self.xlist[-1]**3)*rhoaverage
+        self.rhocenter = ((-1./3)/self.phi*self.xlist[-1]**3)*rhoaverage
 
     # calculate mass for white dwarf
     def calcmass(self):

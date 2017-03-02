@@ -72,6 +72,7 @@ def Ode(solreal,ksireal,phireal,n,dksi,begin,end,initialtheta,initialphi):
 
 # define figure
 fig,(ax1,ax2,ax3) = plt.subplots(3,1,figsize=[20,20])
+fig.suptitle("Plotted Graphs using a stepsize for "r'$\xi$'+" of " + str(dksi),fontsize = 30 )
 fig.subplots_adjust(hspace=.5)
 ax1.set_ylim([-0.1,1.1])
 ttl = ax1.title
@@ -136,7 +137,7 @@ print "The mass of the Dwarf star in solar mass = " + str(Dwarf.mass/(1.99*10**3
 
 
 
-ax1.legend()
-ax2.legend()
-ax3.legend()
+ax1.legend(prop={'size':10})
+ax2.legend(prop={'size':10})
+ax3.legend(prop={'size':10})
 plt.show()
