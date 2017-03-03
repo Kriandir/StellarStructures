@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 import scipy.stats as ss
 import Starobjects as so
+from sklearn.metrics import cohen_kappa_score
 
 
 #-----------------------------------------
@@ -17,7 +18,7 @@ import Starobjects as so
 nvalues = [0,1,(3./2),2,3,4]
 initialtheta = 1.0
 initialphi = 0.
-dksi = 0.001
+dksi = 0.000001
 end = 5
 arraystep = 5
 begin = dksi
@@ -32,7 +33,32 @@ def anaplot(analist,color):
     ax3.plot(xlist,ylist-analist,linestyle="dashed",linewidth ="3",color = color,label="deviation for analytic and numeric n = "+str(n))
     # print "A sigma confidence level of: " + str(p_to_sigmas(1-ss.ttest_ind(ylist,analist)[1])) + "for n = " + str(n)
 
+    # finding out how much the analytical solutions deviate from the numerical solutions
+    ctr001 = 0
+    ctr0001 = 0
+    ctr00001 = 0
+    ctr000001 = 0
+    ctr0000001 = 0
+    for i in range(len(ylist)):
+        if abs(ylist[i] - analist[i])<= 0.001:
+            ctr001 +=1
+        if abs(ylist[i] -analist[i]) <= 0.0001:
+            ctr0001 +=1
+        if abs(ylist[i] - analist[i]) <= 0.00001:
+            ctr00001 +=1
+        if abs(ylist[i] - analist[i]) <= 0.000001:
+            ctr000001 +=1
+        if abs(ylist[i] - analist[i]) <= 0.0000001:
+            ctr0000001 +=1
 
+    print "------------------------------------"
+    print "for n = " + str(n) + " and stepsize "+ str(dksi)
+    print "------------------------------------"
+    print " we have " +str(float(ctr001)/len(ylist)*100) + '%'+" of all the values of the analytical and numerical solution within 0.001"
+    print " we have " +str(float(ctr0001)/len(ylist)*100) + '%'+" of all the values of the analytical and numerical solution within 0.0001"
+    print " we have " +str(float(ctr00001)/len(ylist)*100) + '%'+" of all the values of the analytical and numerical solution within 0.00001"
+    print " we have " +str(float(ctr000001)/len(ylist)*100) + '%'+" of all the values of the analytical and numerical solution within 0.000001"
+    print " we have " +str(float(ctr0000001)/len(ylist)*100) + '%'+" of all the values of the analytical and numerical solution within 0.0000001"
 # Function for ode integration
 def Ode(solreal,ksireal,phireal,n,dksi,begin,end,initialtheta,initialphi):
 
@@ -84,7 +110,6 @@ ttl3.set_position([.5, 1.05])
 ax1.set_title('Graph depicting '+ r'$\theta$'+ " dependence on " r'$\xi$',fontsize=20)
 ax2.set_ylim([-0.1,1.1])
 ax2.set_title('Graph depicting '+ r'$\frac{\rho}{\rho_c}$'+ " dependence on " r'$\xi$',fontsize=20)
-ax3.set_ylim([-0.006*dksi,0.006*dksi])
 ax3.set_title('Graph depicting the deviation of '+ r'$\theta$'+ "\'s dependence on " r'$\xi$',fontsize=20)
 ax1.set_ylabel(r'$\theta$',fontsize=20,rotation=360)
 ax2.set_ylabel(r'$\frac{\rho}{\rho_c}$',fontsize=25,rotation=360)
